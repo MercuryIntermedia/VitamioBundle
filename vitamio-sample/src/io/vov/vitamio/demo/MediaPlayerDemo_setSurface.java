@@ -27,11 +27,12 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.widget.Toast;
 
-import io.vov.vitamio.LibsChecker;
+
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.MediaPlayer.OnBufferingUpdateListener;
 import io.vov.vitamio.MediaPlayer.OnCompletionListener;
 import io.vov.vitamio.MediaPlayer.OnPreparedListener;
+import io.vov.vitamio.Vitamio;
 
 @SuppressLint("NewApi")
 public class MediaPlayerDemo_setSurface extends Activity implements OnBufferingUpdateListener,
@@ -43,7 +44,8 @@ public class MediaPlayerDemo_setSurface extends Activity implements OnBufferingU
   private MediaPlayer mMediaPlayer;
   private TextureView mTextureView;
   private String path;
-
+  private Surface surf;
+  
   private boolean mIsVideoSizeKnown = false;
   private boolean mIsVideoReadyToBePlayed = false;
 
@@ -54,8 +56,7 @@ public class MediaPlayerDemo_setSurface extends Activity implements OnBufferingU
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    if (!LibsChecker.checkVitamioLibs(this))
-      return;
+	Vitamio.isInitialized(getApplicationContext());
     setContentView(R.layout.mediaplayer_3);
     mTextureView = (TextureView) findViewById(R.id.surface);
     mTextureView.setSurfaceTextureListener(this);
@@ -80,7 +81,10 @@ public class MediaPlayerDemo_setSurface extends Activity implements OnBufferingU
       // Create a new media player and set the listeners
       mMediaPlayer = new MediaPlayer(this, true);
       mMediaPlayer.setDataSource(path);
-      mMediaPlayer.setSurface(new Surface(surfaceTexture));
+      if (surf == null) {
+          surf = new Surface (surfaceTexture);
+      }
+      mMediaPlayer.setSurface(surf);
       mMediaPlayer.prepareAsync();
       mMediaPlayer.setOnBufferingUpdateListener(this);
       mMediaPlayer.setOnCompletionListener(this);
